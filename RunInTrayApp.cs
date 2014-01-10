@@ -18,14 +18,15 @@ namespace RunInTray
 
 		private NotifyIcon trayIcon;
 		private ContextMenu trayMenu;
-		private ProcessList processes;
+		private ProcessList processes = new ProcessList();
 
 		public RunInTrayApp()
 		{
 			// Create tray menu.
 			trayMenu = new ContextMenu();
-			trayMenu.MenuItems.Add("Exit", OnExit);
 			trayMenu.MenuItems.Add("Run App", OnRunApp);
+			trayMenu.MenuItems.Add("Kill All", OnKillAll);
+			trayMenu.MenuItems.Add("Exit", OnExit);
 
 			// Create a tray icon. In this example we use a
 			// standard system icon for simplicity, but you
@@ -65,6 +66,18 @@ namespace RunInTray
 			}
 
 			Application.Exit();
+		}
+
+		private void OnKillAll(object sender, EventArgs e)
+		{
+			if (processes.HasProcesses() &&
+				MessageBox.Show(
+					"This will kill all running processes. Are you sure?",
+					"Run in tray",
+					MessageBoxButtons.YesNo) == DialogResult.Yes)
+			{
+				processes.CloseAll();
+			}
 		}
 
 		private void OnRunApp(object sender, EventArgs e)

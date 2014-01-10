@@ -38,6 +38,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProcessList.cs" />
     <Compile Include="RunInTrayApp.cs">
       <SubType>Form</SubType>
     </Compile>
