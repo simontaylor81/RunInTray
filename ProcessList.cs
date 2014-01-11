@@ -7,17 +7,40 @@ using System.Diagnostics;
 
 namespace RunInTray
 {
+	class ProcessException : Exception
+	{
+		public ProcessException(string message = null, Exception inner = null)
+			: base(message, inner)
+		{
+		}
+	}
+
 	class ProcessList
 	{
 		// Run a process.
-		public void RunProcess(string path)
+		public void RunProcess(string path, string[] args)
 		{
-			// Run the file with a hidden window.
-			var startInfo = new ProcessStartInfo(path);
-			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			startInfo.UseShellExecute = true;
+			// Combine args into single string.
+			var quotedArgs = args.Select(arg => ArgvQuote(arg, false));
+			var argString = string.Join(" ", quotedArgs);
 
-			processes.Add(Process.Start(startInfo));
+			// Run the file with a hidden window.
+			var startInfo = new ProcessStartInfo(path, argString);
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			startInfo.UseShellExecute = false;
+
+			try
+			{
+				processes.Add(Process.Start(startInfo));
+			}
+			catch (System.ComponentModel.Win32Exception ex)
+			{
+				throw new ProcessException("Failed to launch process '" + path + "'", ex);
+			}
+			catch (System.IO.FileNotFoundException ex)
+			{
+				throw new ProcessException("Failed to launch process '" + path + "'", ex);
+			}
 		}
 
 		// Close a process, forcefully if necessary.
@@ -75,7 +98,7 @@ namespace RunInTray
 		public IEnumerable<string> GetNames()
 		{
 			RemoveExited();
-			return processes.Select(p => p.ProcessName);
+			return processes.Select(p => p.ProcessName + " " + p.StartInfo.Arguments);
 		}
 
 		// Do we have any running processes?
@@ -98,6 +121,76 @@ namespace RunInTray
 					}
 					return false;
 				});
+		}
+
+/* Converted to C# from:
+ * http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/everyone-quotes-arguments-the-wrong-way.aspx
+
+Routine Description:
+	This routine appends the given argument to a command line such
+	that CommandLineToArgvW will return the argument string unchanged.
+	Arguments in a command line should be separated by spaces; this
+	function does not add these spaces.
+
+Arguments:
+
+	Argument - Supplies the argument to encode.
+	Force - Supplies an indication of whether we should quote
+			the argument even if it does not contain any characters that would
+			ordinarily require quoting.
+*/
+		private string ArgvQuote(string argument, bool force)
+		{
+			// Unless we're told otherwise, don't quote unless we actually
+			// need to do so --- hopefully avoid problems if programs won't
+			// parse quotes properly
+			if (!force &&
+				!string.IsNullOrEmpty(argument) &&
+				argument.IndexOfAny(new[] {' ', '\t', '\n', '\v', '"'}) == -1)
+			{
+				return argument;
+			}
+			else
+			{
+				var commandLine = new StringBuilder();
+				commandLine.Append('"');
+
+				for (int i = 0; ; i++)
+				{
+					int NumberBackslashes = 0;
+
+					while (i != argument.Length && argument[i] == '\\')
+					{
+						++i;
+						++NumberBackslashes;
+					}
+
+					if (i == argument.Length)
+					{
+						// Escape all backslashes, but let the terminating
+						// double quotation mark we add below be interpreted
+						// as a metacharacter.
+						commandLine.Append('\\', NumberBackslashes * 2);
+						break;
+					}
+					else if (argument[i] == '"')
+					{
+						// Escape all backslashes and the following
+						// double quotation mark.
+						commandLine.Append('\\', NumberBackslashes * 2 + 1);
+						commandLine.Append(argument[i]);
+					}
+					else
+					{
+						// Backslashes aren't special here.
+						commandLine.Append('\\', NumberBackslashes);
+						commandLine.Append(argument[i]);
+					}
+				}
+	
+				commandLine.Append('"');
+				return commandLine.ToString();
+			}
 		}
 
 		private List<Process> processes = new List<Process>();

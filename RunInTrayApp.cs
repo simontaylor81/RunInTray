@@ -11,16 +11,16 @@ namespace RunInTray
 	public class RunInTrayApp : Form
 	{
 		[STAThread]
-		public static void Main()
+		public static void Main(string[] args)
 		{
-			Application.Run(new RunInTrayApp());
+			Application.Run(new RunInTrayApp(args));
 		}
 
 		private NotifyIcon trayIcon;
 		private ContextMenuStrip trayMenu;
 		private ProcessList processes = new ProcessList();
 
-		public RunInTrayApp()
+		public RunInTrayApp(string[] args)
 		{
 			// Create tray menu.
 			trayMenu = new ContextMenuStrip();
@@ -36,6 +36,19 @@ namespace RunInTray
 			// Add menu to tray icon and show it.
 			trayIcon.ContextMenuStrip = trayMenu;
 			trayIcon.Visible = true;
+
+			// If an app was specified on the commandline, run it.
+			if (args.Length > 0)
+			{
+				try
+				{
+					processes.RunProcess(args[0], args.Skip(1).ToArray());
+				}
+				catch (ProcessException ex)
+				{
+					MessageBox.Show(ex.Message);
+				}
+			}
 		}
 
 		// Contruct the tray menu on demand before it is opened.
@@ -62,7 +75,6 @@ namespace RunInTray
 			trayMenu.Items.Add("Kill All", null, OnKillAll)
 				.Enabled = processes.HasProcesses();
 			trayMenu.Items.Add("Exit", null, OnExit);
-
 		}
 
 		protected override void OnLoad(EventArgs e)
@@ -115,7 +127,7 @@ namespace RunInTray
 
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{
-				processes.RunProcess(dialog.FileName);
+				processes.RunProcess(dialog.FileName, null);
 			}
 		}
 
