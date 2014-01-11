@@ -17,16 +17,14 @@ namespace RunInTray
 		}
 
 		private NotifyIcon trayIcon;
-		private ContextMenu trayMenu;
+		private ContextMenuStrip trayMenu;
 		private ProcessList processes = new ProcessList();
 
 		public RunInTrayApp()
 		{
 			// Create tray menu.
-			trayMenu = new ContextMenu();
-			trayMenu.MenuItems.Add("Run App", OnRunApp);
-			trayMenu.MenuItems.Add("Kill All", OnKillAll);
-			trayMenu.MenuItems.Add("Exit", OnExit);
+			trayMenu = new ContextMenuStrip();
+			trayMenu.Opening += OnMenuOpening;
 
 			// Create a tray icon. In this example we use a
 			// standard system icon for simplicity, but you
@@ -36,8 +34,35 @@ namespace RunInTray
 			trayIcon.Icon = new Icon(SystemIcons.Application, 16, 16);
 
 			// Add menu to tray icon and show it.
-			trayIcon.ContextMenu = trayMenu;
+			trayIcon.ContextMenuStrip = trayMenu;
 			trayIcon.Visible = true;
+		}
+
+		// Contruct the tray menu on demand before it is opened.
+		private void OnMenuOpening(object sender, System.ComponentModel.CancelEventArgs eventArgs)
+		{
+			// Clear existing entries.
+			trayMenu.Items.Clear();
+
+			// Add sub-menu for each running process.
+			processes.GetNames().ForEach((processName, index) =>
+				{
+					var item = new ToolStripMenuItem(processName, null,
+						new ToolStripMenuItem("Kill", null, new EventHandler((o, e) => processes.Close(index)))
+					);
+					trayMenu.Items.Add(item);
+				});
+
+			if (processes.HasProcesses())
+			{
+				trayMenu.Items.Add(new ToolStripSeparator());
+			}
+
+			trayMenu.Items.Add("Run App", null, OnRunApp);
+			trayMenu.Items.Add("Kill All", null, OnKillAll)
+				.Enabled = processes.HasProcesses();
+			trayMenu.Items.Add("Exit", null, OnExit);
+
 		}
 
 		protected override void OnLoad(EventArgs e)

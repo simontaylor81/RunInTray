@@ -14,10 +14,33 @@ namespace RunInTray
 		{
 			// Run the file with a hidden window.
 			var startInfo = new ProcessStartInfo(path);
-			//startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.UseShellExecute = true;
 
 			processes.Add(Process.Start(startInfo));
+		}
+
+		// Close a process, forcefully if necessary.
+		public void Close(int index)
+		{
+			var process = processes[index];
+			if (process.CloseMainWindow())
+			{
+				// Successfully sent close message, wait for the process to exit.
+				if (!process.WaitForExit(2000))
+				{
+					// Process is not responding -- kill it.
+					process.Kill();
+				}
+			}
+			else
+			{
+				// Could not close the app nicely, so kill it.
+				process.Kill();
+			}
+
+			process.Close();
+			processes.RemoveAt(index);
 		}
 
 		// Close all processes, forcefully if necessary.
