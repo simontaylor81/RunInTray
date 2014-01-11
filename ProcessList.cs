@@ -123,22 +123,21 @@ namespace RunInTray
 				});
 		}
 
-/* Converted to C# from:
- * http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/everyone-quotes-arguments-the-wrong-way.aspx
+		/* Converted to C# from:
+		 * http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/everyone-quotes-arguments-the-wrong-way.aspx
 
-Routine Description:
-	This routine appends the given argument to a command line such
-	that CommandLineToArgvW will return the argument string unchanged.
-	Arguments in a command line should be separated by spaces; this
-	function does not add these spaces.
+		Routine Description:
+			This routine appends the given argument to a command line such
+			that CommandLineToArgvW will return the argument string unchanged.
+			Arguments in a command line should be separated by spaces; this
+			function does not add these spaces.
 
-Arguments:
-
-	Argument - Supplies the argument to encode.
-	Force - Supplies an indication of whether we should quote
-			the argument even if it does not contain any characters that would
-			ordinarily require quoting.
-*/
+		Arguments:
+			Argument - Supplies the argument to encode.
+			Force - Supplies an indication of whether we should quote
+					the argument even if it does not contain any characters that would
+					ordinarily require quoting.
+		*/
 		private string ArgvQuote(string argument, bool force)
 		{
 			// Unless we're told otherwise, don't quote unless we actually
