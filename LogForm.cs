@@ -47,7 +47,6 @@ namespace RunInTray
 			var prevLength = logTextBox.TextLength;
 
 			// Append output to text box.
-			// Don't use AppendText as it messes with the scroll position.
 			logTextBox.AppendText(s);
 
 			// Set colour for new text.
