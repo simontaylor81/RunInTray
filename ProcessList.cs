@@ -15,10 +15,17 @@ namespace RunInTray
 		}
 	}
 
+	// Information we store about a running process.
+	struct ProcessInfo
+	{
+		public Process process;			// Process object
+		public ProcessOutput output;	// Combined stdout and stderr
+	}
+
 	class ProcessList
 	{
 		// Run a process.
-		public void RunProcess(string path, string[] args)
+		public void RunProcess(string path, IEnumerable<string> args)
 		{
 			// Combine args into single string.
 			var quotedArgs = args.Select(arg => ArgvQuote(arg, false));
@@ -26,12 +33,17 @@ namespace RunInTray
 
 			// Run the file with a hidden window.
 			var startInfo = new ProcessStartInfo(path, argString);
-			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			//startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.UseShellExecute = false;
+			startInfo.RedirectStandardOutput = true;
+			//startInfo.RedirectStandardError = true;
 
 			try
 			{
-				processes.Add(Process.Start(startInfo));
+				var process = Process.Start(startInfo);
+				var output = new ProcessOutput(process.StandardOutput);
+				//ProcessOutput output = null;
+				processes.Add(new ProcessInfo() { process = process, output = output });
 			}
 			catch (System.ComponentModel.Win32Exception ex)
 			{
@@ -46,7 +58,7 @@ namespace RunInTray
 		// Close a process, forcefully if necessary.
 		public void Close(int index)
 		{
-			var process = processes[index];
+			var process = processes[index].process;
 			if (process.CloseMainWindow())
 			{
 				// Successfully sent close message, wait for the process to exit.
@@ -71,8 +83,9 @@ namespace RunInTray
 		{
 			RemoveExited();
 
-			foreach (var process in processes)
+			foreach (var processInfo in processes)
 			{
+				var process = processInfo.process;
 				if (process.CloseMainWindow())
 				{
 					// Successfully sent close message, wait for the process to exit.
@@ -98,7 +111,7 @@ namespace RunInTray
 		public IEnumerable<string> GetNames()
 		{
 			RemoveExited();
-			return processes.Select(p => p.ProcessName + " " + p.StartInfo.Arguments);
+			return processes.Select(pi => pi.process.ProcessName + " " + pi.process.StartInfo.Arguments);
 		}
 
 		// Do we have any running processes?
@@ -108,15 +121,23 @@ namespace RunInTray
 			return processes.Any();
 		}
 
+		public ProcessOutput GetProcessOutput(int index)
+		{
+			return processes[index].output;
+		}
+
 		// Remove any exited process from the list.
 		private void RemoveExited()
 		{
 			// Close and remove exited processes.
-			processes.RemoveAll(p =>
+			processes.RemoveAll(pi =>
 				{
-					if (p.HasExited)
+					if (pi.process.HasExited)
 					{
-						p.Close();
+						// TEMP HACK!
+						//Console.Write(pi.process.StandardOutput.ReadToEnd());
+
+						pi.process.Close();
 						return true;
 					}
 					return false;
@@ -192,6 +213,6 @@ namespace RunInTray
 			}
 		}
 
-		private List<Process> processes = new List<Process>();
+		private List<ProcessInfo> processes = new List<ProcessInfo>();
 	}
 }

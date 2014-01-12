@@ -76,10 +76,10 @@ namespace RunInTray
 			// Add sub-menu for each running process.
 			processes.GetNames().ForEach((processName, index) =>
 				{
-					var item = new ToolStripMenuItem(processName, null,
-						new ToolStripMenuItem("Kill", null, new EventHandler((o, e) => processes.Close(index)))
-					);
-					trayMenu.Items.Add(item);
+					trayMenu.Items.Add(new ToolStripMenuItem(processName, null,
+						new ToolStripMenuItem("Kill", null, new EventHandler((o, e) => processes.Close(index))),
+						new ToolStripMenuItem("Output", null, new EventHandler((o, e) => ShowProcessOutput(index)))
+					));
 				});
 
 			if (processes.HasProcesses())
@@ -135,8 +135,14 @@ namespace RunInTray
 
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{
-				processes.RunProcess(dialog.FileName, null);
+				processes.RunProcess(dialog.FileName, Enumerable.Empty<string>());
 			}
+		}
+
+		private void ShowProcessOutput(int index)
+		{
+			var logForm = new LogForm(processes.GetProcessOutput(index));
+			logForm.Show();
 		}
 
 		protected override void Dispose(bool isDisposing)
