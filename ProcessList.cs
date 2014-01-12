@@ -31,8 +31,9 @@ namespace RunInTray
 			var quotedArgs = args.Select(arg => ArgvQuote(arg, false));
 			var argString = string.Join(" ", quotedArgs);
 
-			// Run the file with a hidden window.
+			// Run the file without a window.
 			var startInfo = new ProcessStartInfo(path, argString);
+			startInfo.CreateNoWindow = true;
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.UseShellExecute = false;
 			startInfo.RedirectStandardOutput = true;
