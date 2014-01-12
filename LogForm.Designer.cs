@@ -37,21 +37,21 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.logTextBox = new System.Windows.Forms.TextBox();
+			this.logTextBox = new System.Windows.Forms.RichTextBox();
 			this.SuspendLayout();
 			// 
 			// logTextBox
 			// 
+			this.logTextBox.BackColor = System.Drawing.SystemColors.Window;
 			this.logTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.logTextBox.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.logTextBox.Location = new System.Drawing.Point(0, 0);
-			this.logTextBox.Multiline = true;
 			this.logTextBox.Name = "logTextBox";
 			this.logTextBox.ReadOnly = true;
-			this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
 			this.logTextBox.Size = new System.Drawing.Size(284, 262);
 			this.logTextBox.TabIndex = 0;
+			this.logTextBox.Text = "";
 			this.logTextBox.WordWrap = false;
 			// 
 			// LogForm
@@ -63,12 +63,12 @@
 			this.Name = "LogForm";
 			this.Text = "LogForm";
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.TextBox logTextBox;
+		private System.Windows.Forms.RichTextBox logTextBox;
+
 	}
 }
