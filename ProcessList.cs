@@ -33,10 +33,10 @@ namespace RunInTray
 
 			// Run the file with a hidden window.
 			var startInfo = new ProcessStartInfo(path, argString);
-			//startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.UseShellExecute = false;
 			startInfo.RedirectStandardOutput = true;
-			//startInfo.RedirectStandardError = true;
+			startInfo.RedirectStandardError = true;
 
 			try
 			{

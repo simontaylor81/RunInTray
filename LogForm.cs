@@ -26,8 +26,9 @@ namespace RunInTray
 		{
 			base.OnLoad(e);
 
-			// Subscribe to output sequence.
+			// Subscribe to combined output & error sequence.
 			disposable = output.GetOutput()
+				.Merge(output.GetErrorOutput())
 				.ObserveOn(logTextBox)
 				.Subscribe(c =>
 				{
