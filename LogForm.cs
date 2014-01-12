@@ -32,7 +32,7 @@ namespace RunInTray
 				.Subscribe(c =>
 				{
 					// Append output to text box.
-					logTextBox.Text += c;
+					logTextBox.AppendText(c);
 				});
 		}
 	}

@@ -40,9 +40,9 @@ namespace RunInTray
 
 			try
 			{
+				// Start the process.
 				var process = Process.Start(startInfo);
-				var output = new ProcessOutput(process.StandardOutput);
-				//ProcessOutput output = null;
+				var output = new ProcessOutput(process);
 				processes.Add(new ProcessInfo() { process = process, output = output });
 			}
 			catch (System.ComponentModel.Win32Exception ex)
@@ -74,6 +74,7 @@ namespace RunInTray
 				process.Kill();
 			}
 
+			processes[index].output.Dispose();
 			process.Close();
 			processes.RemoveAt(index);
 		}
@@ -101,6 +102,7 @@ namespace RunInTray
 					process.Kill();
 				}
 
+				processInfo.output.Dispose();
 				process.Close();
 			}
 
@@ -134,9 +136,7 @@ namespace RunInTray
 				{
 					if (pi.process.HasExited)
 					{
-						// TEMP HACK!
-						//Console.Write(pi.process.StandardOutput.ReadToEnd());
-
+						pi.output.Dispose();
 						pi.process.Close();
 						return true;
 					}
