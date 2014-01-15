@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.IO;
 
 namespace RunInTray
 {
@@ -20,6 +21,7 @@ namespace RunInTray
 	{
 		public Process process;			// Process object
 		public ProcessOutput output;	// Combined stdout and stderr
+		public string friendlyName;		// User-displayed name of the process
 	}
 
 	class ProcessList
@@ -43,8 +45,18 @@ namespace RunInTray
 			{
 				// Start the process.
 				var process = Process.Start(startInfo);
-				var output = new ProcessOutput(process);
-				processes.Add(new ProcessInfo() { process = process, output = output });
+
+				// Friendly name is the launch commandline without the directory.
+				var friendlyName = Path.GetFileName(path) + " " + argString;
+
+				// Create output redirection handler.
+				var output = new ProcessOutput(process, friendlyName);
+
+				processes.Add(new ProcessInfo() { 
+					process = process,
+					output = output,
+					friendlyName = friendlyName
+				});
 			}
 			catch (System.ComponentModel.Win32Exception ex)
 			{
@@ -114,7 +126,7 @@ namespace RunInTray
 		public IEnumerable<string> GetNames()
 		{
 			RemoveExited();
-			return processes.Select(pi => pi.process.ProcessName + " " + pi.process.StartInfo.Arguments);
+			return processes.Select(pi => pi.friendlyName);
 		}
 
 		// Do we have any running processes?
