@@ -48,7 +48,7 @@
 			this.logTextBox.Location = new System.Drawing.Point(0, 0);
 			this.logTextBox.Name = "logTextBox";
 			this.logTextBox.ReadOnly = true;
-			this.logTextBox.Size = new System.Drawing.Size(284, 262);
+			this.logTextBox.Size = new System.Drawing.Size(752, 442);
 			this.logTextBox.TabIndex = 0;
 			this.logTextBox.Text = "";
 			this.logTextBox.WordWrap = false;
@@ -57,7 +57,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(284, 262);
+			this.ClientSize = new System.Drawing.Size(752, 442);
 			this.Controls.Add(this.logTextBox);
 			this.Name = "LogForm";
 			this.Text = "LogForm";
