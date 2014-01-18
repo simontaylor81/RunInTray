@@ -79,7 +79,7 @@ namespace RunInTray
 				{
 					trayMenu.Items.Add(new ToolStripMenuItem(processName, null,
 						new ToolStripMenuItem("Kill", null, new EventHandler((o, e) => processes.Close(index))),
-						new ToolStripMenuItem("Output", null, new EventHandler((o, e) => ShowProcessOutput(index)))
+						new ToolStripMenuItem("Output", null, new EventHandler((o, e) => ShowProcessOutput(index, processName)))
 					));
 				});
 
@@ -140,7 +140,7 @@ namespace RunInTray
 			}
 		}
 
-		private void ShowProcessOutput(int index)
+		private void ShowProcessOutput(int index, string processName)
 		{
 			// Get the output object for this process.
 			var processOutput = processes.GetProcessOutput(index);
@@ -159,7 +159,7 @@ namespace RunInTray
 			else
 			{
 				// Existing form not found, so make a new one.
-				logForm = new LogForm(processOutput);
+				logForm = new LogForm(processOutput, processName);
 				logForms.Add(logForm);
 
 				// Remove from the list when the window is done.

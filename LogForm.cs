@@ -19,10 +19,11 @@ namespace RunInTray
 
 		public ProcessOutput ProcessOutput { get { return output; } }
 
-		public LogForm(ProcessOutput output)
+		public LogForm(ProcessOutput output, string title)
 		{
 			InitializeComponent();
 			this.output = output;
+			this.Text = title + " - Output";
 		}
 
 		protected override void OnLoad(EventArgs e)
