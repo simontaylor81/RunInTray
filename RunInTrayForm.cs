@@ -13,6 +13,7 @@ namespace RunInTray
 		private NotifyIcon trayIcon;
 		private ContextMenuStrip trayMenu;
 		private ProcessList processes = new ProcessList();
+		private List<LogForm> logForms = new List<LogForm>();
 
 		public RunInTrayForm()
 		{
@@ -141,8 +142,32 @@ namespace RunInTray
 
 		private void ShowProcessOutput(int index)
 		{
-			var logForm = new LogForm(processes.GetProcessOutput(index));
-			logForm.Show();
+			// Get the output object for this process.
+			var processOutput = processes.GetProcessOutput(index);
+
+			// Find an existing form for this process.
+			var logForm = logForms.FirstOrDefault(f => f.ProcessOutput == processOutput);
+			if (logForm != null)
+			{
+				// We have an existing form, so bring it to the front.
+				logForm.BringToFront();
+				if (logForm.WindowState == FormWindowState.Minimized)
+				{
+					logForm.WindowState = FormWindowState.Normal;
+				}
+			}
+			else
+			{
+				// Existing form not found, so make a new one.
+				logForm = new LogForm(processOutput);
+				logForms.Add(logForm);
+
+				// Remove from the list when the window is done.
+				logForm.FormClosing += (o, e) => logForms.Remove(logForm);
+
+				// Show the form.
+				logForm.Show();
+			}
 		}
 
 		protected override void Dispose(bool isDisposing)

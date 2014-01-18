@@ -20,10 +20,9 @@
 					components.Dispose();
 					components = null;
 				}
-				if (disposable != null)
+				if (disposables != null)
 				{
-					disposable.Dispose();
-					disposable = null;
+					disposables.Dispose();
 				}
 			}
 			base.Dispose(disposing);

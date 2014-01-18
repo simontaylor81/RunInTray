@@ -8,13 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reactive.Linq;
+using System.Reactive.Disposables;
 
 namespace RunInTray
 {
 	public partial class LogForm : Form
 	{
 		private ProcessOutput output;
-		private IDisposable disposable;
+		private CompositeDisposable disposables = new CompositeDisposable();
+
+		public ProcessOutput ProcessOutput { get { return output; } }
 
 		public LogForm(ProcessOutput output)
 		{
@@ -27,14 +30,14 @@ namespace RunInTray
 			base.OnLoad(e);
 
 			// Subscribe to output sequence.
-			disposable = output.GetOutput()
+			disposables.Add(output.GetOutput()
 				.ObserveOn(logTextBox)
-				.Subscribe(s => AddText(s, false));
+				.Subscribe(s => AddText(s, false)));
 
 			// Subscribe to error sequence.
-			disposable = output.GetErrorOutput()
+			disposables.Add(output.GetErrorOutput()
 				.ObserveOn(logTextBox)
-				.Subscribe(s => AddText(s, true));
+				.Subscribe(s => AddText(s, true)));
 		}
 
 		// Add text to the text box.
