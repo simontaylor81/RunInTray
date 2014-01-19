@@ -13,7 +13,7 @@ namespace RunInTray
 		private NotifyIcon trayIcon;
 		private ContextMenuStrip trayMenu;
 		private ProcessList processes = new ProcessList();
-		private List<LogForm> logForms = new List<LogForm>();
+		private List<LogWindow> logWindows = new List<LogWindow>();
 
 		public RunInTrayForm()
 		{
@@ -152,27 +152,27 @@ namespace RunInTray
 			var processOutput = processes.GetProcessOutput(index);
 
 			// Find an existing form for this process.
-			var logForm = logForms.FirstOrDefault(f => f.ProcessOutput == processOutput);
-			if (logForm != null)
+			var logWindow = logWindows.FirstOrDefault(f => f.ProcessOutput == processOutput);
+			if (logWindow != null)
 			{
 				// We have an existing form, so bring it to the front.
-				logForm.BringToFront();
-				if (logForm.WindowState == FormWindowState.Minimized)
+				logWindow.Activate();
+				if (logWindow.WindowState == System.Windows.WindowState.Minimized)
 				{
-					logForm.WindowState = FormWindowState.Normal;
+					logWindow.WindowState = System.Windows.WindowState.Normal;
 				}
 			}
 			else
 			{
 				// Existing form not found, so make a new one.
-				logForm = new LogForm(processOutput, processName);
-				logForms.Add(logForm);
+				logWindow = new LogWindow(processOutput, processName);
+				logWindows.Add(logWindow);
 
 				// Remove from the list when the window is done.
-				logForm.FormClosing += (o, e) => logForms.Remove(logForm);
+				logWindow.Closing += (o, e) => logWindows.Remove(logWindow);
 
 				// Show the form.
-				logForm.Show();
+				logWindow.Show();
 			}
 		}
 

@@ -1,0 +1,11 @@
+﻿<Window x:Class="RunInTray.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="LogWindow" Width="768" Height="480" Loaded="Window_Loaded">
+    <Grid>
+        <TextBox x:Name="logTextBox" BorderThickness="0"
+                 IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                 HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible"
+                 FontFamily="Consolas" FontSize="10pt"/>
+    </Grid>
+</Window>
