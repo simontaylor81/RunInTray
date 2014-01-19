@@ -91,6 +91,7 @@ namespace RunInTray
 			trayMenu.Items.Add("Run App", null, OnRunApp);
 			trayMenu.Items.Add("Kill All", null, OnKillAll)
 				.Enabled = processes.HasProcesses();
+			trayMenu.Items.Add("Open Log Folder", null, OnOpenLogDir);
 			trayMenu.Items.Add("Exit", null, OnExit);
 		}
 
@@ -138,6 +139,11 @@ namespace RunInTray
 			{
 				processes.RunProcess(dialog.FileName, Enumerable.Empty<string>());
 			}
+		}
+
+		private void OnOpenLogDir(object sender, EventArgs e)
+		{
+			processes.OpenLogDir();
 		}
 
 		private void ShowProcessOutput(int index, string processName)

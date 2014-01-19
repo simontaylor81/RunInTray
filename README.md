@@ -27,8 +27,8 @@ under one instance of RunInTray, so only one icon is shown in the tray.
 ## Controlling Apps
 
 Each running app has its own sub-menu in the main tray menu. From here
-you can kill the process (graceful exit is attempted, but if this fails
-the process is forcefully killed), and view its output.
+you can kill the process (graceful exit is attempted via CTRL+C, but if
+this fails the process is forcefully killed), and view its output.
 
 The tray menu also has options for killing all running processes, and
 exiting the application (which also kills all running processes).

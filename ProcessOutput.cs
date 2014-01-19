@@ -74,12 +74,17 @@ namespace RunInTray
 			process.BeginErrorReadLine();
 		}
 
+		public static string GetLogBaseDir()
+		{
+			// Put logs in the user's local application data folder.
+			return Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+				"RunInTray");
+		}
+
 		// Get the location for the logfile of a process.
 		private string GetLogPath(string friendlyName)
 		{
-			// Base directory is the user's local application data folder.
-			var basedir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
 			// Sanitise friendly name for use as a filename.
 			friendlyName = friendlyName.Replace("\"", "'");
 			friendlyName = friendlyName.Replace("<", "");
@@ -95,8 +100,7 @@ namespace RunInTray
 			var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
 			return Path.Combine(
-				basedir,
-				"RunInTray",
+				GetLogBaseDir(),
 				friendlyName,
 				timestamp + ".log");
 		}

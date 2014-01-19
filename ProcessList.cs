@@ -72,18 +72,17 @@ namespace RunInTray
 		public void Close(int index)
 		{
 			var process = processes[index].process;
-			if (process.CloseMainWindow())
+
+			// Try to send CTRL + C to the process to exit cleanly.
+			if (SendCtrlC(process))
 			{
-				// Successfully sent close message, wait for the process to exit.
-				if (!process.WaitForExit(2000))
-				{
-					// Process is not responding -- kill it.
-					process.Kill();
-				}
+				// Wait for the process to exit.
+				process.WaitForExit(2000);
 			}
-			else
+
+			if (!process.HasExited)
 			{
-				// Could not close the app nicely, so kill it.
+				// Process is not responding -- kill it.
 				process.Kill();
 			}
 
@@ -141,6 +140,12 @@ namespace RunInTray
 			return processes[index].output;
 		}
 
+		public void OpenLogDir()
+		{
+			// Use Process.Start to ShellExecute log directory.
+			Process.Start(ProcessOutput.GetLogBaseDir());
+		}
+
 		// Remove any exited process from the list.
 		private void RemoveExited()
 		{
@@ -155,6 +160,38 @@ namespace RunInTray
 					}
 					return false;
 				});
+		}
+
+		// Send CTRL+C to process.
+		private bool SendCtrlC(Process process)
+		{
+			// This is very hard to do in-process, so we use a helper.
+			var appDir = AppDomain.CurrentDomain.BaseDirectory;
+			var path = Path.Combine(appDir, "SendCtrlC.exe");
+
+			var si = new ProcessStartInfo(path, process.Id.ToString());
+			si.UseShellExecute = false;
+			si.CreateNoWindow = true;
+
+			try
+			{
+				using (var helperProcess = Process.Start(si))
+				{
+					if (helperProcess.WaitForExit(1000))
+					{
+						return helperProcess.ExitCode == 0;
+					}
+
+					// Helper process hung for some reason. Kill it so it doesn't hang around.
+					helperProcess.Kill();
+					return false;
+				}
+			}
+			catch (Exception)
+			{
+				// Failed to launch process for some reason.
+				return false;
+			}
 		}
 
 		/* Converted to C# from:
